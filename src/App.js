@@ -290,53 +290,36 @@ export default function App() {
               </button>
             </>
           ) : (
-            <button
-              className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[200px]"
-              onClick={(e) => {
-                e.preventDefault();
-                setTodays([...todays, today]);
-                setToday({ nameToday: "" });
-                setCount(count + 1);
-              }}
-            >
-              New Reminder
-            </button>
+            <>
+              <input
+                className=" text-[#9F9EA4] bg-[#1C1C1E] text-sm p-1 w-screen xl:text-xl"
+                type="text"
+                placeholder="Name List"
+                id="nameList"
+                value={list.nameList}
+                onChange={(e) =>
+                  setList({
+                    ...list,
+                    nameList: e.target.value,
+                  })
+                }
+              />
+              <button
+                className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[400px]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setTodays([...todays, today]);
+                  setToday({ nameToday: "" });
+                  setLists([...lists, list]);
+                  setList({ nameList: "" });
+                  setCount(count + 1);
+                }}
+              >
+                New Reminder
+              </button>
+            </>
           )}
         </form>
-      </div>
-      {/* ItemScheduled */}
-      <div className="min-h-[400px]">
-        <p className="text-left font-bold text-[#FF443A] xl:text-2xl">
-          Scheduled
-        </p>
-        {/* NewReminder */}
-        <p className=" text-sm text-white text-left xl:text-xl">Today</p>
-        <button className="flex">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="black"
-            class="w-6 h-6 xl:w-8 xl:h-8 fill-[#9f9ea4] "
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
-        </button>
-      </div>
-      {/* ItemScheduled */}
-      <div className="min-h-[400px]">
-        <p className="text-left font-bold text-[#9f9ea4] xl:text-2xl">All</p>
-        {/* NewReminder */}
-        <div className="flex gap-1">
-          <p className=" text-sm text-[#9f9ea4] text-left xl:text-xl">
-            Completed ●
-          </p>
-          <button className=" text-sm text-[#9f9ea4] xl:text-xl">Clear</button>
-        </div>
       </div>
     </div>
   );
