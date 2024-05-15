@@ -4,43 +4,91 @@ import ItemList from "./components/ItemList";
 import ItemToday from "./components/ItemToday";
 
 export default function App() {
-  // // eslint-disable-next-lines
-  // const [exist, setExist] = useState(true);
-  // // eslint-disable-next-lines
-  // const [havingList, setHavingList] = useState(0);
+  const [isEditingList, setIsEditingList] = useState(false);
+
+  const [isEditingToday, setIsEditingToday] = useState(false);
+
+  const editedItemIndex = useRef(null);
 
   const [lists, setLists] = useState([]);
-  // eslint-disable-next-lines
+
   const [count, setCount] = useState(0);
 
   const [list, setList] = useState([
     {
-      name: "",
-      count: count,
-    },
-  ]);
-  // eslint-disable-next-lines
-  const [todays, setTodays] = useState([]);
-  // eslint-disable-next-lines
-  const [today, setToday] = useState([
-    {
-      name: "",
+      nameList: "",
     },
   ]);
 
-  const editedItemIndex = useRef(null);
-
-  const handleDelete = (id) => {
+  const handleDeleteList = (id) => {
     setLists(lists.filter((_, index) => index !== id));
-    setList({ name: "" });
+    setIsEditingList(false);
+    setList({ nameList: "" });
   };
 
-  const handleEdit = (index) => {
+  const handleEditList = (index) => {
     editedItemIndex.current = index;
     setList({
-      name: lists[index].name,
-      count: lists[index].count,
+      nameList: lists[index].nameList,
     });
+    setIsEditingList(true);
+  };
+
+  const [todays, setTodays] = useState([]);
+
+  const [today, setToday] = useState([
+    {
+      nameToday: "",
+    },
+  ]);
+
+  const handleDeleteToday = (id) => {
+    setTodays(todays.filter((_, index) => index !== id));
+    setIsEditingToday(false);
+    setToday({ nameToday: "" });
+  };
+
+  const handleEditToday = (index) => {
+    editedItemIndex.current = index;
+    setToday({
+      nameToday: todays[index].nameToday,
+    });
+    setIsEditingToday(true);
+  };
+
+  const handleSaveEditList = () => {
+    const updatedLists = [...lists];
+    updatedLists[editedItemIndex.current] = list;
+    setLists(updatedLists);
+    setIsEditingList(false);
+    setList({ nameList: "" });
+  };
+
+  const handleCancelEditList = () => {
+    setIsEditingList(false);
+    setList({ nameList: "" });
+  };
+
+  const handleSaveEditToday = () => {
+    const updatedTodays = [...todays];
+    updatedTodays[editedItemIndex.current] = today;
+    setTodays(updatedTodays);
+    setIsEditingToday(false);
+    setToday({ nameToday: "" });
+  };
+
+  const handleCancelEditToday = () => {
+    setIsEditingToday(false);
+    setToday({ nameToday: "" });
+  };
+
+  const handleCompleteToday = (index) => {
+    const updatedTodays = [...todays];
+    const updatedToday = { ...todays[index] };
+    updatedToday.completed = !updatedToday.completed;
+
+    updatedTodays[index] = updatedToday;
+    setTodays(updatedTodays);
   };
 
   return (
@@ -146,9 +194,9 @@ export default function App() {
         {lists.map((list, index) => (
           <ItemList
             nameList={list.nameList}
-            count={0}
-            onDelete={() => handleDelete(index)}
-            onEdit={() => handleEdit(index)}
+            count={count}
+            onDeleteList={() => handleDeleteList(index)}
+            onEditList={() => handleEditList(index)}
           />
         ))}
       </div>
@@ -166,27 +214,48 @@ export default function App() {
             })
           }
         />
-        <button
-          className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[100px]"
-          onClick={(e) => {
-            e.preventDefault();
-            setLists([...lists, list]);
-            setList({ nameList: "", count });
-          }}
-        >
-          Add List
-        </button>
+        {isEditingList ? (
+          <>
+            <button
+              className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[200px]"
+              onClick={handleSaveEditList}
+            >
+              Save Edit
+            </button>
+            <button
+              className="text-[#F87171] py-2 text-sm xl:text-2xl w-[100px]"
+              onClick={handleCancelEditList}
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[100px]"
+            onClick={(e) => {
+              e.preventDefault();
+              setLists([...lists, list]);
+              setList({ nameList: "" });
+            }}
+          >
+            Add List
+          </button>
+        )}
       </form>
       {/* ItemToday */}
       <div className="min-h-[400px]">
         <p className="text-left font-bold text-[#457BB1] xl:text-2xl">Today</p>
         <div className="min-h-[400px]">
-          {lists.map((today, index) => (
+          {todays.map((today, index) => (
             <ItemToday
-              name={today.nameToday}
-              count={count}
-              onDelete={() => handleDelete(index)}
-              onEdit={() => handleEdit(index)}
+              onCompleteToday={() => handleCompleteToday(index)}
+              nameToday={today.nameToday}
+              onDeleteToday={() => {
+                setCount(count - 1);
+                handleDeleteToday(index);
+              }}
+              onEditToday={() => handleEditToday(index)}
+              completed={today.completed}
             />
           ))}
         </div>
@@ -195,27 +264,44 @@ export default function App() {
           <input
             className=" text-[#9F9EA4] bg-[#1C1C1E] text-sm p-1 w-screen xl:text-xl"
             type="text"
-            placeholder="Name Reminder Today"
+            placeholder="Name Reminder"
             id="nameToday"
             value={today.nameToday}
             onChange={(e) =>
-              setList({
+              setToday({
                 ...today,
                 nameToday: e.target.value,
               })
             }
           />
-          <button
-            className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[200px]"
-            onClick={(e) => {
-              e.preventDefault();
-              setTodays([...todays, today]);
-              setToday({ nameToday: "" });
-              setCount(count + 1);
-            }}
-          >
-            New Reminder
-          </button>
+          {isEditingToday ? (
+            <>
+              <button
+                className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[200px]"
+                onClick={handleSaveEditToday}
+              >
+                Save Edit
+              </button>
+              <button
+                className="text-[#F87171] py-2 text-sm xl:text-2xl w-[100px]"
+                onClick={handleCancelEditToday}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              className="text-[#457BB1] py-2 text-sm xl:text-2xl w-[200px]"
+              onClick={(e) => {
+                e.preventDefault();
+                setTodays([...todays, today]);
+                setToday({ nameToday: "" });
+                setCount(count + 1);
+              }}
+            >
+              New Reminder
+            </button>
+          )}
         </form>
       </div>
       {/* ItemScheduled */}

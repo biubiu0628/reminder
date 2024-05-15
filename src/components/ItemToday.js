@@ -1,13 +1,20 @@
 import React from "react";
 
-const ItemToday = ({ nameToday, nameList, onDelete, onEdit }) => {
+const ItemToday = ({
+  nameToday,
+  onDeleteToday,
+  onEditToday,
+  onCompleteToday,
+  completed,
+}) => {
   return (
     <div className="flex justify-between bg-[#1C1c1e] place-items-center px-2 rounded-xl py-2 my-2">
-      <input type="radio"></input>
-      <p className="text-white">{nameToday}</p>
-      <p className="text-white">{nameList}</p>
+      <input type="checkbox" onClick={onCompleteToday} />
+      <p className={`text-white ${completed ? "line-through" : ""}`}>
+        {nameToday}
+      </p>
       <div className="flex place-items-center">
-        <button onClick={onEdit}>
+        <button onClick={onEditToday}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -23,7 +30,7 @@ const ItemToday = ({ nameToday, nameList, onDelete, onEdit }) => {
             />
           </svg>
         </button>
-        <button onClick={onDelete}>
+        <button onClick={onDeleteToday}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
